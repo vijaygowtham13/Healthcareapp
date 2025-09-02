@@ -357,7 +357,7 @@ export default function DashboardPage() {
             <Card>
               <CardHeader className="pb-0">
                 <div className="flex items-center justify-between">
-                  <div className="text-sm font-medium">Consultant Activity's</div>
+                  <div className="text-sm font-medium">Consultant Activity's&apos;</div>
                   <div className="flex items-center gap-2">
                     <Button variant="secondary" className="!py-2 !px-3"><Plus className="h-4 w-4" /> More filters</Button>
                   </div>
@@ -379,7 +379,7 @@ export default function DashboardPage() {
             <Card>
               <CardHeader className="pb-0">
                 <div className="flex items-center justify-between">
-                  <div className="text-sm font-medium">Recent Activity's</div>
+                  <div className="text-sm font-medium">Recent Activity's&apos; </div>
                   <Dropdown
                     label="All time"
                     items={[{ label: "All time", value: "all" }, { label: "Last 30 days", value: "30" }, { label: "Last 7 days", value: "7" }]}
