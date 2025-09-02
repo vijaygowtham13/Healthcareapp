@@ -142,7 +142,7 @@ function statusBadge(status: string) {
 
 // ---- Main Component ----
 export default function DashboardPage() {
-  const [user, setUser] = useState<{ name: string } | null>({ name: "Olivia" });
+  const [user, setUser] = useState<{ name: string } | null>({ name: "Kunal Bro" });
   const [period, setPeriod] = useState<"this_month" | "last_month" | "custom">("this_month");
   const [series, setSeries] = useState(makeSeries());
   const [bookings, setBookings] = useState(makeBookings());
@@ -165,7 +165,7 @@ export default function DashboardPage() {
 
   // Fake login handler (replace with Google OAuth in your app)
   function handleGoogleLogin() {
-    const name = prompt("Enter Google account name (demo)") || "Olivia";
+    const name = prompt("Enter Google account name (demo)") || "Kunal Bro";
     setUser({ name });
   }
 
@@ -192,9 +192,16 @@ export default function DashboardPage() {
               <NavItem label="Notifications" badge="10" />
               <NavItem label="Transition History" />
             </NavGroup>
-            <NavGroup title="Reporting">
-              <NavItem label="Users" />
+
+           <NavGroup title="Reporting">
+            <></>
             </NavGroup>
+
+
+
+<NavGroup title="Users">
+<></>
+</NavGroup>
           </div>
           {/* Footer (Support / Settings + Login) */}
           <div>
@@ -207,7 +214,7 @@ export default function DashboardPage() {
                 <div className="h-9 w-9 rounded-xl bg-gray-100" />
                 <div>
                   <div className="text-sm font-medium">{user?.name || "Guest"}</div>
-                  <div className="text-xs text-gray-500">olivia@untitledui.com</div>
+                  <div className="text-xs text-gray-500">kunalbro@untitledui.com</div>
                 </div>
               </div>
               <button onClick={handleGoogleLogin} className="rounded-lg p-2 hover:bg-gray-50" title="Login with Google (demo)">
