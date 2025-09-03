@@ -71,7 +71,8 @@ const Badge: React.FC<{ tone?: "success" | "danger" | "warning" | "muted"; child
   return <span className={`inline-flex items-center rounded-lg px-2 py-0.5 text-xs font-medium ${styles[tone]}`}>{children}</span>;
 };
 
-function exportToCSV(data: any[], filename: string) {
+function exportToCSV(data: Record<string, unknown>[], filename: string) {
+
   if (!data || data.length === 0) return;
 
   const keys = Object.keys(data[0]);
