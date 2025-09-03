@@ -251,7 +251,7 @@ export default function DashboardPage() {
           </div>
         </aside>
         {/* Main */}
-        <main className="mr-6 mt-6 space-y-6">
+        <main className="mr-6 mt-6 space-y-6 ">
           {/* Header */}
           <div className="flex items-start justify-between">
             <div>
@@ -259,16 +259,16 @@ export default function DashboardPage() {
               <p className="text-sm text-gray-500">Track, manage your customers</p>
             </div>
             <div className="flex items-center gap-2">
-           <Button
+           <Button className="cursor-pointer"
   variant="secondary"
   onClick={() => exportToCSV(initialConsultants, "consultants.csv")}
 >
-  <Download className="h-4 w-4" /> Export
+  <Download className="h-4 w-4 cursor-pointer" /> Export
 </Button>
 
          <Link href="/Csvupload">
-  <Button variant="primary">
-    <Plus className="h-4 w-4" /> Add
+  <Button variant="primary" className="cursor-pointer">
+    <Plus className="h-4 w-4 cursor-pointer" /> Add
   </Button>
 </Link>
             </div>
