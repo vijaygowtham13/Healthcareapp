@@ -2,6 +2,7 @@
 
 
 import React, { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import {
 Search,
 ChevronDown,
@@ -70,19 +71,44 @@ const Badge: React.FC<{ tone?: "success" | "danger" | "warning" | "muted"; child
   return <span className={`inline-flex items-center rounded-lg px-2 py-0.5 text-xs font-medium ${styles[tone]}`}>{children}</span>;
 };
 
+function exportToCSV(data: any[], filename: string) {
+  if (!data || data.length === 0) return;
+
+  const keys = Object.keys(data[0]);
+  const rows = data.map((row) => keys.map((k) => row[k]).join(","));
+  const csv = [keys.join(","), ...rows].join("\n");
+
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+  link.href = url;
+  link.setAttribute("download", filename);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+
+
+
+
+
+
+
 // Simple Dropdown component (no external dependency)
 function Dropdown<T extends string>({ label, items, onChange, align = "end" }: { label: React.ReactNode; items: { label: string; value: T }[]; onChange: (value: T) => void; align?: "start" | "end" }) {
   const [open, setOpen] = useState(false);
   return (
     <div className="relative">
-      <Button variant="secondary" className="!py-2 !px-3" onClick={() => setOpen(o => !o)}>
-        <span className="text-sm text-gray-700">{label}</span>
-        <ChevronDown className="h-4 w-4 text-gray-500" />
+      <Button variant="secondary" className="!py-1 !px-1" onClick={() => setOpen(o => !o)}>
+        <span className="text-sm text-gray-800 cursor-pointer">{label}</span>
+        <ChevronDown className="h-4 w-4 text-gray-500 cursor-pointer" />
       </Button>
       {open && (
         <div className={`absolute z-20 mt-2 min-w-[10rem] rounded-xl bg-white p-1 shadow-lg ring-1 ring-black/5 ${align === "end" ? "right-0" : "left-0"}`} onMouseLeave={() => setOpen(false)}>
           {items.map(it => (
-            <button key={it.value} className="w-full text-left rounded-lg px-3 py-2 text-sm hover:bg-gray-50" onClick={() => { onChange(it.value); setOpen(false); }}>
+            <button key={it.value} className="w-full text-left rounded-lg px-3 py-2 text-sm hover:bg-gray-50 cursor-pointer" onClick={() => { onChange(it.value); setOpen(false); }}>
               {it.label}
             </button>
           ))}
@@ -142,7 +168,7 @@ function statusBadge(status: string) {
 
 // ---- Main Component ----
 export default function DashboardPage() {
-  const [user, setUser] = useState<{ name: string } | null>({ name: "Kunal Bro" });
+  const [user, setUser] = useState<{ name: string } | null>({ name: "Dr Prerna" });
   const [period, setPeriod] = useState<"this_month" | "last_month" | "custom">("this_month");
   const [series, setSeries] = useState(makeSeries());
   const [bookings, setBookings] = useState(makeBookings());
@@ -152,7 +178,7 @@ export default function DashboardPage() {
     const id = setInterval(() => {
       setSeries(makeSeries(Math.random() * 10 + 1));
       setBookings(makeBookings());
-    }, 60_000);
+    }, 3000);
     return () => clearInterval(id);
   }, []);
 
@@ -163,7 +189,7 @@ export default function DashboardPage() {
     { label: "Revenue", value: "$9316", delta: "+20%", tone: "success" as const },
   ]), []);
 
-  // Fake login handler (replace with Google OAuth in your app)
+  // Fake login handler 
   function handleGoogleLogin() {
     const name = prompt("Enter Google account name (demo)") || "Kunal Bro";
     setUser({ name });
@@ -214,11 +240,11 @@ export default function DashboardPage() {
                 <div className="h-9 w-9 rounded-xl bg-gray-100" />
                 <div>
                   <div className="text-sm font-medium">{user?.name || "Guest"}</div>
-                  <div className="text-xs text-gray-500">kunalbro@untitledui.com</div>
+                  <div className="text-xs text-gray-500">dr prerna@sukoon.com</div>
                 </div>
               </div>
               <button onClick={handleGoogleLogin} className="rounded-lg p-2 hover:bg-gray-50" title="Login with Google (demo)">
-                <LogIn className="h-5 w-5 text-gray-500" />
+                <LogIn className="h-5 w-5 text-gray-500 cursor-pointer" />
               </button>
             </div>
           </div>
@@ -232,8 +258,18 @@ export default function DashboardPage() {
               <p className="text-sm text-gray-500">Track, manage your customers</p>
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="secondary"><Download className="h-4 w-4" /> Export</Button>
-              <Button variant="primary"><Plus className="h-4 w-4" /> Add</Button>
+           <Button
+  variant="secondary"
+  onClick={() => exportToCSV(initialConsultants, "consultants.csv")}
+>
+  <Download className="h-4 w-4" /> Export
+</Button>
+
+         <Link href="/Csvupload">
+  <Button variant="primary">
+    <Plus className="h-4 w-4" /> Add
+  </Button>
+</Link>
             </div>
           </div>
           {/* Stats */}
@@ -241,9 +277,9 @@ export default function DashboardPage() {
             {totals.map((t) => (
               <Card key={t.label}>
                 <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm text-gray-500">{t.label}</div>
-                    <button className="rounded-lg p-1 hover:bg-gray-50"><EllipsisVertical className="h-4 w-4 text-gray-400" /></button>
+                  <div className="flex items-center justify-between cursor-pointer">
+                    <div className="text-sm text-gray-500 cursor-pointer">{t.label}</div>
+                    <button className="rounded-lg p-1 hover:bg-gray-50 cursor-pointer"><EllipsisVertical className="h-4 w-4 text-gray-400 cursor-pointer" /></button>
                   </div>
                   <div className="mt-1 text-2xl font-semibold tracking-tight">{t.value}</div>
                 </CardHeader>
@@ -365,8 +401,8 @@ export default function DashboardPage() {
               <CardHeader className="pb-0">
                 <div className="flex items-center justify-between">
                   <div className="text-sm font-medium">Consultant Activity&apos;s</div>
-                  <div className="flex items-center gap-2">
-                    <Button variant="secondary" className="!py-2 !px-3"><Plus className="h-4 w-4" /> More filters</Button>
+                  <div className="flex items-center gap-2 cursor-pointer">
+                    <Button variant="secondary" className="!py-2 !px-3 cursor-pointer"><Plus className="h-4 w-4 cursor-pointer" /> More filters</Button>
                   </div>
                 </div>
               </CardHeader>
@@ -421,25 +457,27 @@ function NavGroup({ title, children, defaultOpen = false }: { title: string; chi
   const [open, setOpen] = useState(defaultOpen);
   return (
     <div className="mb-2">
-      <button onClick={() => setOpen(o => !o)} className="flex w-full items-center justify-between rounded-lg px-2 py-2 text-left text-[13px] font-semibold text-gray-700 hover:bg-gray-50">
+      <button onClick={() => setOpen(o => !o)} className="flex w-full items-center justify-between rounded-lg px-2 py-2 text-left text-[13px] font-semibold text-gray-700 hover:bg-gray-50 cursor-pointer">
         <span>{title}</span>
-        {open ? <ChevronDown className="h-4 w-4 text-gray-400" /> : <ChevronRight className="h-4 w-4 text-gray-400" />}
+        {open ? <ChevronDown className="h-4 w-4 text-gray-400 cursor-pointer" /> : <ChevronRight className="h-4 w-4 text-gray-400" />}
       </button>
       {open && (
-        <div className="mt-1 space-y-1 pl-2">{children}</div>
+        <div className="mt-1 space-y-1 pl-2 cursor-pointer">{children}</div>
       )}
     </div>
   );
 }
 
+
 function NavItem({ label, active, badge, icon }: { label: string; active?: boolean; badge?: string; icon?: React.ReactNode }) {
   return (
-    <button className={`flex w-full items-center justify-between rounded-lg px-2 py-2 text-sm ${active ? "bg-emerald-50 text-emerald-700" : "text-gray-700 hover:bg-gray-50"}`}>
+    <button className={`flex w-full items-center justify-between rounded-lg px-2 py-2 text-sm ${active ? "bg-emerald-50 text-emerald-700" : "text-gray-700 hover:bg-gray-50 cursor-pointer"}`}>
       <span className="flex items-center gap-2">{icon}<span>{label}</span></span>
-      {badge && <span className="rounded-md bg-gray-100 px-2 py-0.5 text-xs text-gray-600">{badge}</span>}
+      {badge && <span className="rounded-md bg-gray-100 px-2 py-0.5 text-xs text-gray-600 cursor-pointer">{badge}</span>}
     </button>
   );
 }
+
 
 function Table({ columns, children }: { columns: string[]; children: React.ReactNode }) {
   return (
@@ -463,9 +501,9 @@ function Table({ columns, children }: { columns: string[]; children: React.React
 function TableFooter() {
   return (
     <div className="mt-4 flex items-center justify-between text-sm text-gray-600">
-      <div className="flex items-center gap-2">
-        <Button variant="secondary" className="!py-1.5 !px-3"><ChevronLeft className="h-4 w-4" /> Previous</Button>
-        <Button variant="secondary" className="!py-1.5 !px-3">Next</Button>
+      <div className="flex items-center gap-2 ">
+        <Button variant="secondary" className="!py-1.5 !px-3 cursor-pointer"><ChevronLeft className="h-4 w-4" /> Previous</Button>
+        <Button variant="secondary" className="!py-1.5 !px-3 cursor-pointer">Next</Button>
       </div>
       <div>Page 1 of 10</div>
     </div>
