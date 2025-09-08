@@ -173,6 +173,7 @@ export default function DashboardPage() {
   const [period, setPeriod] = useState<"this_month" | "last_month" | "custom">("this_month");
   const [series, setSeries] = useState(makeSeries());
   const [bookings, setBookings] = useState(makeBookings());
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Auto-refresh stub every minute — replace fetchers with real API calls
   useEffect(() => {
@@ -199,9 +200,9 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900">
       {/* Shell */}
-      <div className="grid grid-cols-[280px_1fr] gap-6">
-        {/* Sidebar */}
-        <aside className="flex min-h-screen flex-col justify-between border-r border-gray-200 bg-white px-4 py-4">
+      <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-0 lg:gap-6">
+        {/* Sidebar (Desktop) */}
+        <aside className="hidden lg:flex min-h-screen flex-col justify-between border-r border-gray-200 bg-white px-4 py-4">
           <div>
             {/* Brand */}
             <div className="mb-4 flex items-center gap-3 px-2">
@@ -250,202 +251,251 @@ export default function DashboardPage() {
             </div>
           </div>
         </aside>
+        {/* Sidebar (Mobile) */}
+        {sidebarOpen && (
+          <>
+            <div className="fixed inset-0 z-40 bg-black/30 transition-opacity duration-200" onClick={() => setSidebarOpen(false)} />
+            <aside className="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 lg:hidden flex flex-col h-full justify-between">
+              <div>
+                <div className="mb-4 flex items-center gap-3 px-2 pt-4">
+                  <div className="h-7 w-7 rounded-xl bg-gradient-to-br from-indigo-400 to-violet-500" />
+                  <div className="font-semibold">Sukoon</div>
+                  <button onClick={() => setSidebarOpen(false)} className="ml-auto p-2 rounded-lg hover:bg-gray-100 cursor-pointer lg:hidden">
+                    <svg xmlns='http://www.w3.org/2000/svg' className='h-6 w-6 text-gray-700' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
+                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
+                    </svg>
+                  </button>
+                </div>
+                {/* Search */}
+                <div className="relative mb-4 px-2">
+                  <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                  <input placeholder="Search" className="w-full rounded-xl border border-gray-200 bg-white py-2 pl-9 pr-3 text-sm outline-none placeholder:text-gray-400 focus:ring-2 focus:ring-emerald-500" />
+                </div>
+                {/* Nav groups */}
+                <NavGroup title="Dashboard" defaultOpen>
+                  <NavItem label="Overview" active />
+                  <NavItem label="Notifications" badge="10" />
+                  <NavItem label="Transition History" />
+                </NavGroup>
+                <NavGroup title="Reporting">
+                  <></>
+                </NavGroup>
+                <NavGroup title="Users">
+                  <></>
+                </NavGroup>
+              </div>
+              <div className="mb-4 px-2">
+                <div className="space-y-1">
+                  <NavItem icon={<HelpCircle className="h-4 w-4" />} label="Support" />
+                  <NavItem icon={<Settings className="h-4 w-4" />} label="Settings" />
+                </div>
+                <div className="mt-6 flex items-center justify-between rounded-xl border border-gray-200 p-3">
+                  <div className="flex items-center gap-3">
+                    <div className="h-9 w-9 rounded-xl bg-gray-100" />
+                    <div>
+                      <div className="text-sm font-medium">{user?.name || "Guest"}</div>
+                      <div className="text-xs text-gray-500">dr prerna@sukoon.com</div>
+                    </div>
+                  </div>
+                  <button onClick={handleGoogleLogin} className="rounded-lg p-2 hover:bg-gray-50" title="Login with Google (demo)">
+                    <LogIn className="h-5 w-5 text-gray-500 cursor-pointer" />
+                  </button>
+                </div>
+              </div>
+            </aside>
+          </>
+        )}
         {/* Main */}
-        <main className="mr-6 mt-6 space-y-6 ">
-          {/* Header */}
-          <div className="flex items-start justify-between">
-            <div>
-              <h1 className="text-2xl font-semibold">Welcome back, {user?.name || "Guest"}</h1>
-              <p className="text-sm text-gray-500">Track, manage your customers</p>
-            </div>
-            <div className="flex items-center gap-2">
-           <Button className="cursor-pointer"
-  variant="secondary"
-  onClick={() => exportToCSV(initialConsultants, "consultants.csv")}
->
-  <Download className="h-4 w-4 cursor-pointer" /> Export
-</Button>
-
-         <Link href="/Csvupload">
-  <Button variant="primary" className="cursor-pointer">
-    <Plus className="h-4 w-4 cursor-pointer" /> Add
-  </Button>
-</Link>
+        <main className="mr-0 lg:mr-6 mt-0 lg:mt-6 space-y-6">
+          {/* Mobile Header */}
+          <div className="flex items-center justify-between px-4 py-4 lg:hidden bg-white border-b border-gray-200 sticky top-0 z-30">
+            <div className="flex items-center gap-3">
+              <button onClick={() => setSidebarOpen(true)} className="p-2 rounded-lg hover:bg-gray-100 cursor-pointer lg:hidden">
+                <svg xmlns='http://www.w3.org/2000/svg' className='h-6 w-6 text-gray-700' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
+                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M4 6h16M4 12h16m-7 6h7' />
+                </svg>
+              </button>
+              <span className="font-semibold text-lg">Sukoon</span>
             </div>
           </div>
-          {/* Stats */}
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
-            {totals.map((t) => (
-              <Card key={t.label}>
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between cursor-pointer">
-                    <div className="text-sm text-gray-500 cursor-pointer">{t.label}</div>
-                    <button className="rounded-lg p-1 hover:bg-gray-50 cursor-pointer"><EllipsisVertical className="h-4 w-4 text-gray-400 cursor-pointer" /></button>
+          <div className="px-4">
+            <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+              <div>
+                <h1 className="text-2xl font-semibold">Welcome back, {user?.name || "Guest"}</h1>
+                <p className="text-sm text-gray-500">Track, manage your customers</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button className="cursor-pointer" variant="secondary" onClick={() => exportToCSV(initialConsultants, "consultants.csv")}> <Download className="h-4 w-4 cursor-pointer" /> Export </Button>
+                <Link href="/Csvupload">
+                  <Button variant="primary" className="cursor-pointer"> <Plus className="h-4 w-4 cursor-pointer" /> Add </Button>
+                </Link>
+              </div>
+            </div>
+            {/* Stats */}
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 mt-4">
+              {totals.map((t) => (
+                <Card key={t.label}>
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between cursor-pointer">
+                      <div className="text-sm text-gray-500 cursor-pointer">{t.label}</div>
+                      <button className="rounded-lg p-1 hover:bg-gray-50 cursor-pointer"><EllipsisVertical className="h-4 w-4 text-gray-400 cursor-pointer" /></button>
+                    </div>
+                    <div className="mt-1 text-2xl font-semibold tracking-tight">{t.value}</div>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    {t.tone === "success" ? (
+                      <div className="flex items-center gap-2 text-sm text-emerald-600"><ChevronUp className="h-4 w-4" />{t.delta}<span className="text-gray-400">vs last month</span></div>
+                    ) : (
+                      <div className="flex items-center gap-2 text-sm text-red-600"><ChevronDown className="h-4 w-4" />{t.delta}<span className="text-gray-400">vs last month</span></div>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+            {/* Charts */}
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-3 mt-4">
+              <Card className="lg:col-span-2">
+                <CardHeader className="pb-2">
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm font-medium text-gray-900">Sales Funnel</div>
+                    <Dropdown
+                      label={period === "this_month" ? "This Month" : period === "last_month" ? "Last Month" : "Custom"}
+                      items={[
+                        { label: "This Month", value: "this_month" },
+                        { label: "Last Month", value: "last_month" },
+                        { label: "Custom", value: "custom" },
+                      ]}
+                      onChange={(v) => setPeriod(v)}
+                    />
                   </div>
-                  <div className="mt-1 text-2xl font-semibold tracking-tight">{t.value}</div>
                 </CardHeader>
-                <CardContent className="pt-0">
-                  {t.tone === "success" ? (
-                    <div className="flex items-center gap-2 text-sm text-emerald-600"><ChevronUp className="h-4 w-4" />{t.delta}<span className="text-gray-400">vs last month</span></div>
-                  ) : (
-                    <div className="flex items-center gap-2 text-sm text-red-600"><ChevronDown className="h-4 w-4" />{t.delta}<span className="text-gray-400">vs last month</span></div>
-                  )}
+                <CardContent>
+                  <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart
+                        data={series}
+                        margin={{ top: 10, right: 20, left: 0, bottom: 0 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" stroke="#eef2f7" />
+                        <XAxis
+                          dataKey="day"
+                          tickLine={false}
+                          axisLine={false}
+                          tick={{ stroke: "#94a3b8", fontSize: 12 }}
+                        />
+                        <YAxis
+                          tickLine={false}
+                          axisLine={false}
+                          tick={{ stroke: "#94a3b8", fontSize: 12 }}
+                        />
+                        <Tooltip contentStyle={{ borderRadius: 12, borderColor: "#e5e7eb" }} />
+                        <ReferenceLine x="17" stroke="#10b981" strokeDasharray="3 3" />
+                        <ReferenceDot
+                          x="17"
+                          y={series[16]?.value}
+                          r={5}
+                          fill="#10b981"
+                          stroke="#10b981"
+                        />
+                        <Line
+                          type="monotone"
+                          dataKey="value"
+                          strokeWidth={2}
+                          stroke="#10b981"
+                          dot={false}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
                 </CardContent>
               </Card>
-            ))}
-          </div>
-          {/* Charts */}
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-            <Card className="lg:col-span-2">
-              <CardHeader className="pb-2">
-                <div className="flex items-center justify-between">
-                  <div className="text-sm font-medium text-gray-900">Sales Funnel</div>
-                  <Dropdown
-                    label={period === "this_month" ? "This Month" : period === "last_month" ? "Last Month" : "Custom"}
-                    items={[
-                      { label: "This Month", value: "this_month" },
-                      { label: "Last Month", value: "last_month" },
-                      { label: "Custom", value: "custom" },
-                    ]}
-                    onChange={(v) => setPeriod(v)}
-                  />
-                </div>
-              </CardHeader>
-              <CardContent>
-             
-<div className="h-64">
-  <ResponsiveContainer width="100%" height="100%">
-    <LineChart
-      data={series}
-      margin={{ top: 10, right: 20, left: 0, bottom: 0 }}
-    >
-      <CartesianGrid strokeDasharray="3 3" stroke="#eef2f7" />
-      <XAxis
-        dataKey="day"
-        tickLine={false}
-        axisLine={false}
-        // Fix: use stroke for tick color
-        tick={{ stroke: "#94a3b8", fontSize: 12 }}
-      />
-      <YAxis
-        tickLine={false}
-        axisLine={false}
-        tick={{ stroke: "#94a3b8", fontSize: 12 }}
-      />
-      <Tooltip contentStyle={{ borderRadius: 12, borderColor: "#e5e7eb" }} />
-      <ReferenceLine x="17" stroke="#10b981" strokeDasharray="3 3" />
-      <ReferenceDot
-        x="17"
-        y={series[16]?.value}
-        r={5}
-        fill="#10b981"
-        stroke="#10b981"
-      />
-      <Line
-        type="monotone"
-        dataKey="value"
-        strokeWidth={2}
-        stroke="#10b981"
-        dot={false}
-      />
-    </LineChart>
-  </ResponsiveContainer>
-</div>
-
-
-
-
-
-
-
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <div className="flex items-center justify-between">
-                  <div className="text-sm font-medium text-gray-900">Bookings</div>
-                  <div className="flex items-center gap-4 text-xs text-gray-500">
-                    <div className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-emerald-500" /> Chat</div>
-                    <div className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-emerald-300" /> Video Call</div>
+              <Card>
+                <CardHeader className="pb-2">
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm font-medium text-gray-900">Bookings</div>
+                    <div className="flex items-center gap-4 text-xs text-gray-500">
+                      <div className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-emerald-500" /> Chat</div>
+                      <div className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-emerald-300" /> Video Call</div>
+                    </div>
                   </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="h-64">
-                 <ResponsiveContainer width="100%" height="100%">
-  <AreaChart data={bookings} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
-    <defs>
-      <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="5%" stopColor="#10b981" stopOpacity={0.25} />
-        <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-      </linearGradient>
-    </defs>
-    <CartesianGrid strokeDasharray="3 3" stroke="#eef2f7" />
-    <XAxis
-      dataKey="m"
-      tickLine={false}
-      axisLine={false}
-      tick={{ stroke: "#94a3b8", fontSize: 12 }}
-    />
-    <YAxis hide />
-    <Tooltip contentStyle={{ borderRadius: 12, borderColor: "#e5e7eb" }} />
-    <Area type="monotone" dataKey="value" stroke="#10b981" fill="url(#g1)" strokeWidth={2} />
-  </AreaChart>
-</ResponsiveContainer>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-          {/* Tables */}
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-            <Card>
-              <CardHeader className="pb-0">
-                <div className="flex items-center justify-between">
-                  <div className="text-sm font-medium">Consultant Activity&apos;s</div>
-                  <div className="flex items-center gap-2 cursor-pointer">
-                    <Button variant="secondary" className="!py-2 !px-3 cursor-pointer"><Plus className="h-4 w-4 cursor-pointer" /> More filters</Button>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={bookings} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                        <defs>
+                          <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#10b981" stopOpacity={0.25} />
+                            <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#eef2f7" />
+                        <XAxis
+                          dataKey="m"
+                          tickLine={false}
+                          axisLine={false}
+                          tick={{ stroke: "#94a3b8", fontSize: 12 }}
+                        />
+                        <YAxis hide />
+                        <Tooltip contentStyle={{ borderRadius: 12, borderColor: "#e5e7eb" }} />
+                        <Area type="monotone" dataKey="value" stroke="#10b981" fill="url(#g1)" strokeWidth={2} />
+                      </AreaChart>
+                    </ResponsiveContainer>
                   </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <Table columns={["Doctor Name", "Time", "Status"]}>
-                  {initialConsultants.map((r) => (
-                    <tr key={r.doctor} className="border-t border-gray-100">
-                      <td className="py-3 text-sm">{r.doctor}</td>
-                      <td className="py-3 text-sm text-gray-600">{r.time}</td>
-                      <td className="py-3">{statusBadge(r.status)}</td>
-                    </tr>
-                  ))}
-                </Table>
-                <TableFooter />
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-0">
-                <div className="flex items-center justify-between">
-                  <div className="text-sm font-medium">Recent Activity&apos; s</div>
-                  <Dropdown
-                    label="All time"
-                    items={[{ label: "All time", value: "all" }, { label: "Last 30 days", value: "30" }, { label: "Last 7 days", value: "7" }]}
-                    onChange={() => {}}
-                  />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <Table columns={["Name", "Doctor Name", "Time", "Type", "Status"]}>
-                  {initialActivities.map((r, i) => (
-                    <tr key={i} className="border-t border-gray-100">
-                      <td className="py-3 text-sm">{r.name}</td>
-                      <td className="py-3 text-sm">{r.doctor}</td>
-                      <td className="py-3 text-sm text-gray-600">{r.time}</td>
-                      <td className="py-3 text-sm text-gray-600">{r.type}</td>
-                      <td className="py-3">{statusBadge(r.status)}</td>
-                    </tr>
-                  ))}
-                </Table>
-                <TableFooter />
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </div>
+            {/* Tables */}
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 mt-4">
+              <Card>
+                <CardHeader className="pb-0">
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm font-medium">Consultant Activity&apos;s</div>
+                    <div className="flex items-center gap-2 cursor-pointer">
+                      <Button variant="secondary" className="!py-2 !px-3 cursor-pointer"><Plus className="h-4 w-4 cursor-pointer" /> More filters</Button>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <Table columns={["Doctor Name", "Time", "Status"]}>
+                    {initialConsultants.map((r) => (
+                      <tr key={r.doctor} className="border-t border-gray-100">
+                        <td className="py-3 text-sm">{r.doctor}</td>
+                        <td className="py-3 text-sm text-gray-600">{r.time}</td>
+                        <td className="py-3">{statusBadge(r.status)}</td>
+                      </tr>
+                    ))}
+                  </Table>
+                  <TableFooter />
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="pb-0">
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm font-medium">Recent Activity&apos; s</div>
+                    <Dropdown
+                      label="All time"
+                      items={[{ label: "All time", value: "all" }, { label: "Last 30 days", value: "30" }, { label: "Last 7 days", value: "7" }]}
+                      onChange={() => {}}
+                    />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <Table columns={["Name", "Doctor Name", "Time", "Type", "Status"]}>
+                    {initialActivities.map((r, i) => (
+                      <tr key={i} className="border-t border-gray-100">
+                        <td className="py-3 text-sm">{r.name}</td>
+                        <td className="py-3 text-sm">{r.doctor}</td>
+                        <td className="py-3 text-sm text-gray-600">{r.time}</td>
+                        <td className="py-3 text-sm text-gray-600">{r.type}</td>
+                        <td className="py-3">{statusBadge(r.status)}</td>
+                      </tr>
+                    ))}
+                  </Table>
+                  <TableFooter />
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </main>
       </div>
